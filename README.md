@@ -1,6 +1,6 @@
 # Chat-Application
 
-This is a chat application project. Here you can find the real time chat environment so feel free to explore yourself.
+This is a <b>chat application</b> project. Here you can find the real time chat environment so feel free to explore yourself.
 
 # Feature
 

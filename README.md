@@ -4,10 +4,10 @@ This is a <b>chat application</b> project. Here you can find the real time chat 
 
 # Feature
 
-- Authentication system enabled
-- Real-Time chat system configured
-- Search engine optimised for user search
-- Role Based user creation
+- Authentication system enabled.
+- Real-Time chat system configured.
+- Search engine optimised for user search.
+- Role Based user creation.
 
 # WorkFlow
 

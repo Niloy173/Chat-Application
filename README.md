@@ -16,6 +16,10 @@ This project is based on the real time chat system between one and another user.
 In the future task, I will try to develop a system (Friend List) for each user which he/she added
 through out the search engine will show up in his/her friend zone.
 
+This project is inspired from [sumit saha](https://github.com/learnwithsumit/chat-application) <b>"chat-Application"</b> program.I have learned a lot working along 
+wtth this project.Faced some challenges while working on [socket](https://www.npmjs.com/package/socket.io) programming.
+
+
 # check out
 
 https://chatapplication101.herokuapp.com/

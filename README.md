@@ -11,7 +11,7 @@ This is a chat application project. Here you can find the real time chat environ
 
 # WorkFlow
 
-This project is based on the real time chat system between one and another user.After user login (While checking all the field in authentication) an user can find his/her friend with a user search engine (developed quite efficiently and very much optimized) to add and starting chating & also the person has the right to delete the messages but don't have permission to ***create users*** by their own as ***admin will handle the user creation***.so check the ***admin.ext*** file in the root folder for login as admin
+This project is based on the real time chat system between one and another user.After user login (While checking all the field in authentication) an user can find his/her friend with a user search engine (developed quite efficiently and very much optimized) to add and starting chating & also the person has the right to delete the messages but don't have permission to ***create users*** by their own as ***admin will handle the user creation***.so check the ***admin.txt*** file in the root folder for login as admin
 
 In the future task, I will try to develop a system (Friend List) for each user which he/she added
 through out the search engine will show up in his/her friend zone.

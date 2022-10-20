@@ -41,6 +41,10 @@ app.set("view engine", "ejs");
 
 // static file path
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  "/avatar",
+  express.static(path.join(__dirname, "/public/uploads/avatars/"))
+);
 
 //all the route
 app.use("/", loginRoute.router);

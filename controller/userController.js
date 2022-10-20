@@ -64,23 +64,32 @@ async function removeuser(req, res, next) {
     if (user.avatar) {
       unlink(
         path.join(__dirname, `/../public/uploads/avatars/${user.avatar}`),
-        (err) => {
+        async (err) => {
           if (err) console.log(err);
+          else {
+            // delete the co-responding conversation
+            const delete_conversation = await conversation.deleteMany({
+              $or: [
+                { "creator.id": req.params.id },
+                { "participant.id": req.params.id },
+              ],
+            });
+
+            // delete the co-responding messages
+            const delete_messages = await Message.deleteMany({
+              $or: [
+                { "sender.id": req.params.id },
+                { "receiver.id": req.params.id },
+              ],
+            });
+
+            res.status(200).json({
+              message: "User was deleted successfully",
+            });
+          }
         }
       );
     }
-
-    // delete the co-responding conversation
-    const delete_conversation = await conversation.deleteMany({
-      $or: [
-        { "creator.id": req.params.id },
-        { "participant.id": req.params.id },
-      ],
-    });
-
-    res.status(200).json({
-      message: "User was deleted successfully",
-    });
   } catch (error) {
     res.status(500).json({
       errors: {

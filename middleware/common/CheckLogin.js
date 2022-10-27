@@ -59,11 +59,12 @@ function RoleBaseAuthorize(role) {
   return function (req, res, next) {
     if (req.user.role && role.includes(req.user.role)) {
       next();
-    } else {
-      res.sendFile(
-        path.join(__dirname, "../../views/partials/ImportantMsg.html")
-      );
     }
+    // else {
+    //   res.sendFile(
+    //     path.join(__dirname, "../../views/partials/ImportantMsg.html")
+    //   );
+    // }
   };
 }
 

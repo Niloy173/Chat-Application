@@ -30,7 +30,7 @@ router.get(
   "/",
   decorateHtmlResponse("user"),
   checkLogin,
-  RoleBaseAuthorize(["admin"]),
+  RoleBaseAuthorize(["admin", "user"]),
   getUsers
 );
 

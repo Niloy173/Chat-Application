@@ -770,3 +770,17 @@ input[type="submit"]:active {
   );
   background: linear-gradient(to right, var(--green) 0%, var(--blue) 100%);
 }
+
+.doc {
+  background: var(--tertiary);
+  outline: none;
+  padding: 15px;
+  border: 1px solid var(--dark);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 1.4rem;
+  text-align: center;
+  text-decoration: none;
+  text-align: center;
+  opacity: 0.4;
+}

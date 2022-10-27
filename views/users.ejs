@@ -1,80 +1,125 @@
 <%- include("./partials/header.ejs"); %>
-    <div class="manageUser-container">
-      <div id="title">
-        <h2>Manage Users</h2>
-      </div>
+<%if(role === "user"){%>
 
-      <div class="new-message-container new-user">
-        <a href="#" onclick="openModal()">+</a>
-      </div>
-
-      <div id="users-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Manage</th>
-            </tr>
-          </thead>
-          <tbody id="users-table">
-            <% users.forEach((user) => { %>
-            <tr id="<%= user._id %>">
-              <td class="name">
-                <% if(user.avatar) { %>
-                  <img src="/avatar/<%= user.avatar %>" />
-                  <% } else { %>
-
-                    <img src="./images/nophoto.png" />
-
-                    <% } %>
-                <span><%= user.name %></span>
-              </td>
-              <td><%= user.email %></td>
-              <td class="manage">
-                <img  src="./images/trash.png" alt="Delete" onclick="deleteuser('<%= user._id %>')"  />
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
-        </table>
-      </div>
+  <div class="manageUser-container">
+    <div id="title">
+      <h2>All Users</h2>
     </div>
 
-    <%- include("./partials/addusermodal.ejs"); %>
+    <div id="users-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="users-table">
+          <% users.forEach((user) => { %>
+          <tr id="<%= user._id %>">
+            <td class="name">
+              <% if(user.avatar) { %>
+                <img src="/avatar/<%= user.avatar %>" />
+                <% } else { %>
+
+                  <img src="./images/nophoto.png" />
+
+                  <% } %>
+              <span><%= user.name %></span>
+            </td>
+            <td><%= user.email %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  
+  
+<% }else{ %>
+
+  <div class="manageUser-container">
+    <div id="title">
+      <h2>Manage Users</h2>
+    </div>
+
+    <div class="new-message-container new-user">
+      <a href="#" onclick="openModal()">+</a>
+    </div>
+
+    <div id="users-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Manage</th>
+          </tr>
+        </thead>
+        <tbody id="users-table">
+          <% users.forEach((user) => { %>
+          <tr id="<%= user._id %>">
+            <td class="name">
+              <% if(user.avatar) { %>
+                <img src="/avatar/<%= user.avatar %>" />
+                <% } else { %>
+
+                  <img src="./images/nophoto.png" />
+
+                  <% } %>
+              <span><%= user.name %></span>
+            </td>
+            <td><%= user.email %></td>
+            <td class="manage">
+              <img  src="./images/trash.png" alt="Delete" onclick="deleteuser('<%= user._id %>')"  />
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%- include("./partials/addusermodal.ejs"); %>
 
 <script>
 
 const deletesuccessToast = Toastify({
-    text: "User was deleted successfully! .",
+  text: "User was deleted successfully! .",
 
-    duration: 4000,
+  duration: 4000,
+});
+
+const failureToast = Toastify({
+  text: "Failed to delete data! .",
+
+  duration: 4000,
+});
+
+async function deleteuser(userid) {
+  const response = await fetch(`/users/${userid}`, {
+    method: "DELETE",
   });
 
-  const failureToast = Toastify({
-    text: "Failed to delete data! .",
+  const result = await response.json();
 
-    duration: 4000,
-  });
+  if (result.errors) {
+    failureToast.showToast();
+   
+  } else {
 
-  async function deleteuser(userid) {
-    const response = await fetch(`/users/${userid}`, {
-      method: "DELETE",
-    });
-
-    const result = await response.json();
-
-    if (result.errors) {
-      failureToast.showToast();
-     
-    } else {
-
-      deletesuccessToast.showToast();
-      document.getElementById(userid).remove();
-     
-    }
+    deletesuccessToast.showToast();
+    document.getElementById(userid).remove();
+   
   }
+}
+ 
+
+   
 </script>
+
+<% } %>
 
   </body>
 </html>

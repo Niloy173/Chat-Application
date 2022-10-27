@@ -15,6 +15,7 @@ async function getUsers(req, res, next) {
     const users = await People.find();
     res.render("users", {
       users: users,
+      role: req.user.role,
     });
   } catch (error) {
     throw createError(error.message);

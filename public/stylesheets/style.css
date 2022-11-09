@@ -439,8 +439,9 @@ input[type="submit"]:active {
   display: grid;
 }
 
-.message-content img {
+.message-content .otheruser {
   width: 32px;
+  border-radius: 100%;
 }
 
 .you-message {
@@ -462,8 +463,12 @@ input[type="submit"]:active {
   grid-column-gap: 15px;
 }
 
+.message-row .attachment-img {
+  width: 50px;
+}
+
 .message-row img:first-of-type {
-  border-radius: 100%;
+  /* border-radius: 100%; */
   grid-row: span 2;
 }
 

@@ -1,7 +1,7 @@
 <%- include('./partials/header.ejs'); %>
     <div id="chat-container">
       <div id="search-container">
-        <input type="text" placeholder="Search" />
+        <!-- <input type="text" placeholder="Search" /> -->
       </div>
       <div id="conversation-list">
         <% data.forEach(function(conversation) { %>
@@ -41,7 +41,7 @@
 
       <div id="chat-title">
         <span id="conversation-partner"></span>
-        <img onclick="DeleteCurrentConversation()"   src="./images/trash.png" alt="Delete Conversation" />
+        <img title="Delete Conversation" onclick="DeleteCurrentConversation()"   src="./images/trash.png" alt="Delete Conversation" />
       </div>
 
       <!-- placeholder div if no messages are in messages area -->
@@ -53,7 +53,7 @@
       <form id="chat-form" method="post" enctype="multipart/form-data">
         <label for="attachment"><img src="./images/attachment.png" alt="Add Attachment" /></label>
         <input type="file" multiple name="attachment" class="hide" id="attachment" />
-        <input  type="text" name="message" placeholder="Type a message" autocomplete="off" />
+        <input required  type="text" name="message" placeholder="Type a message or send message with attachment" autocomplete="off" />
 
       </form>
 
@@ -123,12 +123,12 @@
 
                 let senderAvatar = message.sender.avatar ? `./uploads/avatars/${message.sender.avatar}` : './images/nophoto.png';
                   const messageClass = message.sender.id === loggedinUserId ? 'you-message' : 'other-message';
-                  const showAvatar = message.sender.id === loggedinUserId ? '' : `<img src="${senderAvatar}" alt="${message.sender.name}" />`;
+                  const showAvatar = message.sender.id === loggedinUserId ? '' : `<img class='otheruser' src="${senderAvatar}" alt="${message.sender.name}" />`;
                   // message attachments
                   let attachments = '<div class="attachments">';
                   if(message.attachment && message.attachment.length > 0) {
                     message.attachment.forEach(attachment => {
-                      attachments += `<img src="./uploads/attachments/${attachment}" /> `;
+                      attachments += `<img class="attachment-img" src="./uploads/attachments/${attachment}" /> `;
                     });
                 }
 

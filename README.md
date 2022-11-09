@@ -18,4 +18,4 @@ through out the search engine will show up in his/her friend zone.
 
 # check out
 
-https://chatapplication101.herokuapp.com/
+https://chatapp-j8xc.onrender.com/

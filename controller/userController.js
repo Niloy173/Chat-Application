@@ -90,6 +90,23 @@ async function removeuser(req, res, next) {
           }
         }
       );
+    } else {
+      // delete the co-responding conversation
+      const delete_conversation = await conversation.deleteMany({
+        $or: [
+          { "creator.id": req.params.id },
+          { "participant.id": req.params.id },
+        ],
+      });
+
+      // delete the co-responding messages
+      const delete_messages = await Message.deleteMany({
+        $or: [{ "sender.id": req.params.id }, { "receiver.id": req.params.id }],
+      });
+
+      res.status(200).json({
+        message: "User was deleted successfully",
+      });
     }
   } catch (error) {
     res.status(500).json({

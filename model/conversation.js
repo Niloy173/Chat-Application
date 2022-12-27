@@ -5,13 +5,19 @@ const conversationSchema = mongoose.Schema(
     creator: {
       id: mongoose.Types.ObjectId,
       name: String,
-      avatar: String,
+      avatar: {
+        data: Buffer,
+        contentType: String,
+      },
     },
 
     participant: {
       id: mongoose.Types.ObjectId,
       name: String,
-      avatar: String,
+      avatar: {
+        data: Buffer,
+        contentType: String,
+      },
     },
 
     last_updated: {

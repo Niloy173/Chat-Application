@@ -14,6 +14,7 @@ const {
 } = require("../controller/loginController");
 
 const { redirectLoggedIn } = require("../middleware/common/CheckLogin");
+const { GetProfileAvatar } = require("../middleware/user/FetchAvatar");
 const {
   decorateHtmlResponse,
 } = require("../middleware/common/decorateHtmlResponse");
@@ -21,7 +22,13 @@ const {
 const router = express.Router();
 
 //login page
-router.get("/", decorateHtmlResponse("login"), redirectLoggedIn, getLogin);
+router.get(
+  "/",
+  decorateHtmlResponse("login"),
+  redirectLoggedIn,
+  GetProfileAvatar,
+  getLogin
+);
 
 router.post(
   "/",

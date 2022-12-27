@@ -8,21 +8,19 @@
           <!-- conversation creator is same to logged in user, so we need to show participant name and avatar -->
           <% if(conversation.creator.id == loggedInUser.userid) { %>
             <div class="conversation" onclick="getAllMessages('<%= conversation._id %>',  '<%= conversation.participant.name %>')">
-              <% if (conversation.participant.avatar) { %>
-              <img title="<%= conversation.participant.name %>" src="./uploads/avatars/<%= conversation.participant.avatar %>" alt="<%= conversation.participant.name %>" />
-              <% } else { %>
-                <img  title="<%= conversation.participant.name %>" src="./images/nophoto.png" />
-              <% } %>
+             
+              <img title="<%= conversation.participant.name %>" src="data:image/<%=conversation.participant.avatar.contentType%>;base64,
+              <%=conversation.participant.avatar.data.toString('base64')%>" alt="<%= conversation.participant.name %>" />
+             
               <div class="title-text"><%= conversation.participant.name %></div>
               <div class="conversation-date"><%= moment(conversation.last_updated).fromNow() %></div>
             </div>
           <% } else { %>
             <div class="conversation" onclick="getAllMessages('<%= conversation._id %>', '<%= conversation.creator.name %>')">
-              <% if (conversation.creator.avatar) { %>
-              <img  title="<%= conversation.creator.name %>" src="./uploads/avatars/<%= conversation.creator.avatar %>" alt="<%= conversation.creator.name %>" />
-              <% } else { %>
-                <img  title="<%= conversation.creator.name %>" src="./images/nophoto.png" />
-              <% } %>
+            
+              <img title="<%= conversation.creator.name %>" src="data:image/<%=conversation.creator.avatar.contentType%>;base64,
+              <%=conversation.creator.avatar.data.toString('base64')%>" alt="<%= conversation.creator.name %>" />
+
               <div class="title-text"><%= conversation.creator.name %></div>
               <div class="conversation-date"><%= moment(conversation.last_updated).fromNow() %></div>
             </div>
@@ -53,7 +51,7 @@
       <form id="chat-form" method="post" enctype="multipart/form-data">
         <label for="attachment"><img src="./images/attachment.png" alt="Add Attachment" /></label>
         <input type="file" multiple name="attachment" class="hide" id="attachment" />
-        <input required  type="text" name="message" placeholder="Type a message or send message with attachment" autocomplete="off" />
+        <input required  type="text" name="message" placeholder="Type a message or send message with attachment (maximum 2)" autocomplete="off" />
 
       </form>
 
@@ -77,6 +75,22 @@
        // socket initialization
         const socket = io('<%= process.env.APP_URL %>');
 
+        // converting binary to image;
+        function BinaryToImage(avatar){
+        
+        let binary = '';
+        let bytes = new Uint8Array(avatar.data);
+        let len = bytes.length;
+
+        for (let index = 0; index < bytes.length; index++) {
+          binary += String.fromCharCode(bytes[index])
+          
+        }
+        
+        return binary;
+
+        }
+
 
        
 
@@ -87,7 +101,7 @@
 
     
       // message failure Toast
-      const messageFailureToast = Toastify(
+      const messageFailureToast =  Toastify(
         {
           text: "Error loading messages",
           duration : 2000,
@@ -106,7 +120,7 @@
           const {info, user, conversation_id} = result;
 
          
-          console.log(info);
+          // console.log(info);
           participant = info.participant;
           current_conversation_id = conversation_id;
           current_conversation_name = conversation_name;
@@ -121,14 +135,16 @@
 
               info.messages.forEach((message) => {
 
-                let senderAvatar = message.sender.avatar ? `./uploads/avatars/${message.sender.avatar}` : './images/nophoto.png';
+                // let senderAvatar = message.sender.avatar ? `./uploads/avatars/${message.sender.avatar}` : './images/nophoto.png';
+                  let senderAvatar = `data:image/${message.sender.avatar.contentType};base64,${btoa(BinaryToImage(message.sender.avatar.data))}`
                   const messageClass = message.sender.id === loggedinUserId ? 'you-message' : 'other-message';
                   const showAvatar = message.sender.id === loggedinUserId ? '' : `<img class='otheruser' src="${senderAvatar}" alt="${message.sender.name}" />`;
                   // message attachments
                   let attachments = '<div class="attachments">';
                   if(message.attachment && message.attachment.length > 0) {
                     message.attachment.forEach(attachment => {
-                      attachments += `<img class="attachment-img" src="./uploads/attachments/${attachment}" /> `;
+                      // attachments += `<img class="attachment-img" src="./uploads/attachments/${attachment}" /> `;
+                      attachments += `<img class="attachment-img" src="data:image/${attachment.contentType};base64,${btoa(BinaryToImage(attachment.data))}" alt="single-attachment" />`
                     });
                 }
 
@@ -191,19 +207,22 @@
     // handle new/live incoming message from socket
       socket.on("new_message", data => {
         
-        // console.log(data.message.conversation_id);
+    
+         //console.log(data.message.conversation_id == current_conversation_id);
         // console.log(current_conversation_id);
         // only respond if current conversation is open in any client
-        if(data.message.conversation_id == current_conversation_id) {
+          if(data.message.conversation_id == current_conversation_id) {
           // message class
           const messageClass = data.message.sender.id === loggedinUserId ? 'you-message' : 'other-message';
           
-          const senderAvatar = data.message.sender.avatar ? `<img src="./uploads/avatars/${data.message.sender.avatar}" alt="${data.message.sender.name}" />` : `<img src="./images/nophoto.png" alt="${data.message.sender.name}" />`;
+          // const senderAvatar = data.message.sender.avatar ? `<img src="./uploads/avatars/${data.message.sender.avatar}" alt="${data.message.sender.name}" />` : `<img src="./images/nophoto.png" alt="${data.message.sender.name}" />`;
+          const senderAvatar =  `<img src="data:image/${data.message.sender.avatar.contentType};base64,${btoa(BinaryToImage(data.message.sender.avatar.data))}" alt="${data.message.sender.name}" />`;
+
           // message attachments
           let attachments = '<div class="attachments">';
           if(data.message.attachment && data.message.attachment.length > 0) {
             data.message.attachment.forEach(attachment => {
-              attachments += `<img src="./uploads/attachments/${attachment}" /> `;
+              attachments += `<img src="data:image/${attachment.contentType};base64,${btoa(BinaryToImage(attachment.data))}/>" `;
             });
           }
           attachments += '</div>';
@@ -226,19 +245,20 @@
           // append the inoming message to message area as last item
           document.querySelector('#chat-message-list .message-row:first-child').insertAdjacentHTML('beforeBegin', messageHTML);
         }
+          
+  
       });
 
     form.onsubmit = async function (event) {
         event.preventDefault();
-        const sendMessageFailureToast = Toastify({
-          text: "Error sending message",
+        const sendMessageFailureToast = (msg) => Toastify({
+          text: msg || "Error sending message",
           duration: 1000,
         });
       //  prepare the form data
         const formData_ = new FormData(form);
         formData_.append('receiverId', participant.id);
         formData_.append('receiverName', participant.name);
-        formData_.append('avatar', participant.avatar || ' ');
         formData_.append('conversationId', current_conversation_id);
 
         //send the request to server
@@ -256,7 +276,7 @@
           getAllMessages(current_conversation_id,current_conversation_name);
          
         } else {
-          sendMessageFailureToast.showToast();
+          sendMessageFailureToast(result.errors.common.msg).showToast();
         }
       }
     

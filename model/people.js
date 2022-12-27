@@ -23,7 +23,8 @@ const peopleSchema = mongoose.Schema(
     },
 
     avatar: {
-      type: String,
+      data: Buffer,
+      contentType: String,
     },
 
     role: {

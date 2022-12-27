@@ -60,11 +60,12 @@ function userValidatorHandler(req, res, next) {
   } else {
     if (req.files.length > 0) {
       const { filename } = req.files[0];
-      console.log(filename);
+      // console.log(filename);
       unlink(
-        path.join(__dirname, `/../public/uploads/avatars/${filename}`),
+        path.join(__dirname, `/../../public/uploads/avatars/${filename}`),
         (err) => {
           if (err) console.log(err);
+          console.log("file deleted");
         }
       );
     }

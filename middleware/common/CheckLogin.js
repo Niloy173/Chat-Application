@@ -45,6 +45,9 @@ const redirectLoggedIn = function (req, res, next) {
 
   if (cookies) {
     let token = cookies[process.env.COOKIE_NAME];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+
     if (token) {
       res.redirect("/inbox");
     } else {

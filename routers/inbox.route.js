@@ -15,11 +15,18 @@ const {
 const {
   decorateHtmlResponse,
 } = require("../middleware/common/decorateHtmlResponse");
+const { GetProfileAvatar } = require("../middleware/user/FetchAvatar");
 /* router object */
 const router = express.Router();
 
 //login page
-router.get("/", decorateHtmlResponse("inbox"), checkLogin, getInbox);
+router.get(
+  "/",
+  decorateHtmlResponse("inbox"),
+  checkLogin,
+  GetProfileAvatar,
+  getInbox
+);
 
 router.post("/search", checkLogin, searchUser);
 

@@ -28,8 +28,8 @@ let users_placeholder = document.querySelector(".search_users");
 
 
  // conversation created failure toast
- const conversationFailureToast = Toastify({
-    text: "Error creating a conversation!",
+ const conversationFailureToast = (msg) => Toastify({
+    text: msg || "Error creating a conversation!",
     duration: 1000,
   });
 
@@ -42,6 +42,22 @@ function openModal()
 function closeModal()
 {
   modal.style.display = "none";
+}
+
+// converting binary to image;
+function BinaryToImage(avatar){
+ 
+  let binary = '';
+  let bytes = new Uint8Array(avatar.data);
+  let len = bytes.length;
+
+  for (let index = 0; index < bytes.length; index++) {
+    binary += String.fromCharCode(bytes[index])
+    
+  }
+  
+ return binary;
+ 
 }
 
 //  on keyup start the countDown
@@ -94,12 +110,12 @@ async function searchUsers()
       let generateHTML = "<ul>";
         result.forEach((user) => {
 
-          const avatar = user.avatar ? "./uploads/avatars/"+user.avatar : "./images/nophoto.png";
+          // const avatar = user.avatar ? "./uploads/avatars/"+user.avatar : "./images/nophoto.png";
 
-          generateHTML += `<li onclick="createConversation('${user._id}', '${user.name}', '${user.avatar}')">
+          generateHTML += `<li onclick="createConversation('${user._id}', '${user.name}')">
             <div class="user">
               <div class="avatar">
-                <img src="${avatar}" />
+                 <img src="data:image/${user.avatar.contentType};base64,${btoa(BinaryToImage(user.avatar.data))}" />
                 </div>
                 <div style="color : #f2f2f2; font-size: 1.5rem; margin : 10px 0;" class="username">${user.name}</div>
                 </div>
@@ -114,7 +130,7 @@ async function searchUsers()
 }
 
 
- async function createConversation(p_id,name,avatar)
+ async function createConversation(p_id,name)
 {
 
   // console.log(p_id);
@@ -128,7 +144,6 @@ async function searchUsers()
 
         participant : name,
         id : p_id,
-        avatar : avatar != "undefined"? avatar : null,
       }),
 
       headers : {
@@ -148,12 +163,12 @@ async function searchUsers()
         location.reload(1);
       },1000);
     }else{
-      throw new Error(result.errors.common.msg);
+      conversationFailureToast(result.errors.common.msg).showToast();
     }
     
   } catch (error) {
 
-    conversationFailureToast.showToast();
+    conversationFailureToast().showToast();
   }
 
 }

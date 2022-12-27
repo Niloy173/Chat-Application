@@ -7,18 +7,25 @@ const messageSchema = mongoose.Schema(
     },
     attachment: [
       {
-        type: String,
+        data: Buffer,
+        contentType: String,
       },
     ],
     sender: {
       id: mongoose.Types.ObjectId,
       name: String,
-      avatar: String,
+      avatar: {
+        data: Buffer,
+        contentType: String,
+      },
     },
     receiver: {
       id: mongoose.Types.ObjectId,
       name: String,
-      avatar: String,
+      avatar: {
+        data: Buffer,
+        contentType: String,
+      },
     },
     date_time: {
       type: Date,

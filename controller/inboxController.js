@@ -3,6 +3,9 @@ const { conversation } = require("../model/conversation");
 const createError = require("http-errors");
 const { escape } = require("../utilities/escape");
 const { Message } = require("../model/Message");
+const { default: mongoose } = require("mongoose");
+const { readFileSync, unlink } = require("fs");
+const path = require("path");
 
 // login page - get controller
 async function getInbox(req, res, next) {
@@ -63,24 +66,69 @@ async function searchUser(req, res, next) {
 // add conversation
 async function addConversation(req, res, next) {
   try {
-    const newConversation = new conversation({
-      creator: {
-        id: req.user.userid,
-        name: req.user.username,
-        avatar: req.user.avatar || null,
-      },
-      participant: {
-        name: req.body.participant,
-        id: req.body.id,
-        avatar: req.body.avatar || null,
-      },
+    const Owner = await People.findOne({
+      _id: mongoose.Types.ObjectId(req.user.userid),
     });
 
-    const result = await newConversation.save();
-    res.status(200).json({
-      message: "Conversation was added successfully!",
+    const Participant = await People.findOne({
+      _id: mongoose.Types.ObjectId(req.body.id),
     });
+
+    const conversation_data = await conversation.find({
+      $or: [
+        {
+          $and: [
+            { "creator.id": req.user.userid },
+            { "participant.id": req.body.id },
+          ],
+        },
+
+        {
+          $and: [
+            { "creator.id": req.body.id },
+            { "participant.id": req.user.userid },
+          ],
+        },
+      ],
+    });
+
+    if (conversation_data.length > 0) {
+      res.status(500).json({
+        errors: {
+          common: {
+            msg: "Already connected",
+          },
+        },
+      });
+    } else if (Owner.id === Participant.id) {
+      res.status(500).json({
+        errors: {
+          common: {
+            msg: "Try another user",
+          },
+        },
+      });
+    } else {
+      const newConversation = new conversation({
+        creator: {
+          id: req.user.userid,
+          name: req.user.username,
+          avatar: Owner.avatar,
+        },
+        participant: {
+          name: req.body.participant,
+          id: req.body.id,
+          avatar: Participant.avatar,
+        },
+      });
+
+      const result = await newConversation.save();
+      res.status(200).json({
+        message: "Conversation was added successfully!",
+      });
+    }
   } catch (err) {
+    console.log(err);
     res.status(500).json({
       errors: {
         common: {
@@ -122,9 +170,29 @@ async function getMessages(req, res, next) {
   }
 }
 
+function BinaryToImage(avatar) {
+  let binary = "";
+  let bytes = new Uint8Array(avatar.data);
+  let len = bytes.length;
+
+  for (let index = 0; index < bytes.length; index++) {
+    binary += String.fromCharCode(bytes[index]);
+  }
+
+  return binary;
+}
+
 async function sendMessage(req, res, next) {
   // console.log(req.files);
   // console.log(req.body.message);
+  const Owner = await People.findOne({
+    _id: mongoose.Types.ObjectId(req.user.userid),
+  });
+
+  const Participant = await People.findOne({
+    _id: mongoose.Types.ObjectId(req.body.receiverId),
+  });
+
   if (req.body.message || (req.files && req.files.length > 0)) {
     try {
       // save message text/attachment in database
@@ -133,7 +201,16 @@ async function sendMessage(req, res, next) {
       if (req.files && req.files.length > 0) {
         attachments = [];
         req.files.forEach((element) => {
-          attachments.push(element.filename);
+          attachments.push({
+            data: readFileSync(
+              path.join(
+                __dirname,
+                "/../public/uploads/attachments/",
+                element.filename
+              )
+            ),
+            contentType: path.extname(element.filename).replace(".", ""),
+          });
         });
       }
 
@@ -144,13 +221,13 @@ async function sendMessage(req, res, next) {
         sender: {
           id: req.user.userid,
           name: req.user.username,
-          avatar: req.user.avatar || null,
+          avatar: Owner.avatar,
         },
 
         receiver: {
           id: req.body.receiverId,
           name: req.body.receiverName,
-          avatar: req.body.avatar || null,
+          avatar: Participant.avatar,
         },
 
         conversation_id: req.body.conversationId,
@@ -164,7 +241,7 @@ async function sendMessage(req, res, next) {
           sender: {
             id: req.user.userid,
             name: req.user.username,
-            avatar: req.user.avatar || null,
+            avatar: Owner.avatar,
           },
 
           message_: req.body.message,
@@ -173,11 +250,26 @@ async function sendMessage(req, res, next) {
         },
       });
 
+      req.files.forEach(async (file) => {
+        await unlink(
+          path.join(
+            __dirname,
+            "/../public/uploads/attachments/",
+            file.filename
+          ),
+          (err) => {
+            if (err) console.log(err);
+          }
+        );
+        // console.log("file deleted");
+      });
+
       res.status(200).json({
         message: "Successful!",
         data: result,
       });
     } catch (error) {
+      console.log(error);
       res.status(500).json({
         errors: {
           common: {

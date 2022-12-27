@@ -24,14 +24,6 @@
               <%= user.avatar.data.toString('base64')%>" />
                
 
-              <% if(user.avatar) { %>
-                <img src="./uploads/avatars/<%= user.avatar %>" />
-                <% } else { %>
-
-                  <img src="./images/nophoto.png" />
-
-                  <% } %>
-
               <span><%= user.name %></span>
             </td>
             <td><%= user.email %></td>
@@ -73,14 +65,6 @@
                 <img src="data:image/<%= user.avatar.contentType %>;base64,
                 <%= user.avatar.data.toString('base64')%>" />
                 
-
-              <% if(user.avatar) { %>
-                <img src="./uploads/avatars/<%= user.avatar %>" />
-                <% } else { %>
-
-                  <img src="./images/nophoto.png" />
-
-                  <% } %>
 
               <span><%= user.name %></span>
             </td>

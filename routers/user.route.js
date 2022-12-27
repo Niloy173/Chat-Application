@@ -22,6 +22,7 @@ const {
   userValidatorHandler,
 } = require("../middleware/user/userValidation");
 const { avatarUpload } = require("../middleware/user/avatarUpload");
+const { GetProfileAvatar } = require("../middleware/user/FetchAvatar");
 /* router object */
 const router = express.Router();
 
@@ -31,6 +32,7 @@ router.get(
   decorateHtmlResponse("user"),
   checkLogin,
   RoleBaseAuthorize(["admin", "user"]),
+  GetProfileAvatar,
   getUsers
 );
 

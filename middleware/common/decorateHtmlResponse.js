@@ -1,6 +1,7 @@
 function decorateHtmlResponse(title) {
   return function (req, res, next) {
     res.locals.loggedInUser = {};
+    res.locals.profileAvatar = {};
     res.locals.errors = {};
     res.locals.data = {};
     res.locals.html = true;

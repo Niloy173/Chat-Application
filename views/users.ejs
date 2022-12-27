@@ -18,13 +18,10 @@
           <% users.forEach((user) => { %>
           <tr id="<%= user._id %>">
             <td class="name">
-              <% if(user.avatar) { %>
-                <img src="./uploads/avatars/<%= user.avatar %>" />
-                <% } else { %>
-
-                  <img src="./images/nophoto.png" />
-
-                  <% } %>
+             
+              <img src="data:image/<%= user.avatar.contentType %>;base64,
+              <%= user.avatar.data.toString('base64')%>" />
+               
               <span><%= user.name %></span>
             </td>
             <td><%= user.email %></td>
@@ -61,13 +58,10 @@
           <% users.forEach((user) => { %>
           <tr id="<%= user._id %>">
             <td class="name">
-              <% if(user.avatar) { %>
-                <img src="./uploads/avatars/<%= user.avatar %>" />
-                <% } else { %>
-
-                  <img src="./images/nophoto.png" />
-
-                  <% } %>
+            
+                <img src="data:image/<%= user.avatar.contentType %>;base64,
+                <%= user.avatar.data.toString('base64')%>" />
+                
               <span><%= user.name %></span>
             </td>
             <td><%= user.email %></td>

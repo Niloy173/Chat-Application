@@ -18,10 +18,9 @@ through out the search engine will show up in his/her friend zone.
 
 ## Available Scripts
 
-### `copy/paste this data in mongocompass or mongo atlas under collection (db: people) for initial admin pass`
+### `copy/paste this data in mongocompass or mongo atlas under above collection & (document: people) for initial admin pass`
 
 ![data](https://user-images.githubusercontent.com/63700841/209719800-e4f1d9b6-4739-4c92-bdf3-8636d7ba72cb.PNG)
-
 
 ```sh
 {

@@ -1,7 +1,7 @@
 // external package
 const createError = require("http-errors");
 const bcrpyt = require("bcrypt");
-const { unlink } = require("fs");
+const { unlink, readFileSync } = require("fs");
 const path = require("path");
 
 // internal imports
@@ -30,18 +30,49 @@ async function addUsers(req, res, next) {
   if (req.files && req.files.length > 0) {
     newUser = new People({
       ...req.body,
-      avatar: req.files[0].filename,
+      avatar: {
+        data: readFileSync(
+          path.join(
+            __dirname,
+            "/../public/uploads/avatars/",
+            req.files[0].filename
+          )
+        ),
+        contentType: path.extname(req.files[0].filename).replace(".", ""),
+      },
       password: hashedPassoword,
     });
   } else {
     newUser = new People({
       ...req.body,
+      avatar: {
+        data: readFileSync(
+          path.join(__dirname, "/../public/images/", "nophoto.png")
+        ),
+        contentType: "png",
+      },
       password: hashedPassoword,
     });
   }
 
   try {
     const result = await newUser.save();
+
+    if (req.files[0]) {
+      // or use req.files.length
+      unlink(
+        path.join(
+          __dirname,
+          "/../public/uploads/avatars/",
+          req.files[0].filename
+        ),
+        (err) => {
+          if (err) console.log(err);
+        }
+      );
+    }
+
+    console.log("user created successfully");
     res.status(200).json({
       message: "User was added successfuly",
     });
@@ -62,52 +93,22 @@ async function removeuser(req, res, next) {
       _id: req.params.id,
     });
 
-    if (user.avatar) {
-      unlink(
-        path.join(__dirname, `/../public/uploads/avatars/${user.avatar}`),
-        async (err) => {
-          if (err) console.log(err);
-          else {
-            // delete the co-responding conversation
-            const delete_conversation = await conversation.deleteMany({
-              $or: [
-                { "creator.id": req.params.id },
-                { "participant.id": req.params.id },
-              ],
-            });
+    // delete the co-responding conversation
+    const delete_conversation = await conversation.deleteMany({
+      $or: [
+        { "creator.id": req.params.id },
+        { "participant.id": req.params.id },
+      ],
+    });
 
-            // delete the co-responding messages
-            const delete_messages = await Message.deleteMany({
-              $or: [
-                { "sender.id": req.params.id },
-                { "receiver.id": req.params.id },
-              ],
-            });
+    // delete the co-responding messages
+    const delete_messages = await Message.deleteMany({
+      $or: [{ "sender.id": req.params.id }, { "receiver.id": req.params.id }],
+    });
 
-            res.status(200).json({
-              message: "User was deleted successfully",
-            });
-          }
-        }
-      );
-    } else {
-      // delete the co-responding conversation
-      const delete_conversation = await conversation.deleteMany({
-        $or: [
-          { "creator.id": req.params.id },
-          { "participant.id": req.params.id },
-        ],
-      });
-
-      // delete the co-responding messages
-      const delete_messages = await Message.deleteMany({
-        $or: [{ "sender.id": req.params.id }, { "receiver.id": req.params.id }],
-      });
-
-      res.status(200).json({
-        message: "User was deleted successfully",
-      });
-    }
+    res.status(200).json({
+      message: "User was deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({
       errors: {
